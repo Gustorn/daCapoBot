@@ -16,22 +16,12 @@ class BotListener(private val config: Config,
     override fun onMessage(event: MessageEvent) {
         super.onMessage(event)
 
-        val nick = event.user?.nick ?: return
+        val user = event.user?.nick ?: return
         val message = event.message ?: return
-        database.logChat(nick, message)
+        database.logChat(user, message)
 
-        if (!message.startsWith(config.commandPrefix)) {
-            return
-        }
-
-        val strippedCommand = message.substring(config.commandPrefix.length)
-        val command: List<String> = strippedCommand.split(Regex("\\s+"), 2)
-        val commandName = command[0]
-        val args = command.elementAtOrElse(1, { "" })
-
-        val response = commandRegistry[commandName]?.execute(nick, args)
-        if (response != null) {
-            event.respondWith(response)
-        }
+        val (commandName, args) = extractCommand(message, config) ?: return
+        val response = commandRegistry[commandName]?.execute(user, args, config) ?: return
+        event.respondWith(response)
     }
 }

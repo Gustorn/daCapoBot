@@ -1,15 +1,15 @@
 import java.io.File
-import java.sql.Connection
 import java.nio.file.FileVisitOption
 import java.nio.file.Files
 import java.nio.file.Path
+import java.sql.Connection
+import java.sql.DriverManager
 import java.sql.PreparedStatement
+import java.sql.ResultSet
 import java.util.*
 import java.util.stream.Collectors
 
 import org.flywaydb.core.Flyway
-import java.sql.DriverManager
-import java.sql.ResultSet
 
 class SQLiteDatabase(config: Config) : Database {
     private val connection: Connection
@@ -79,26 +79,36 @@ class SQLiteDatabase(config: Config) : Database {
         loggingStatement.executeUpdate()
     }
 
-    override fun addRequest(user: String, request: String): List<Track> {
-        val matchingTracks = getMatchingTracks(request)
-        if (matchingTracks.size == 1) {
-            addRequestStatement.setLong(1, System.currentTimeMillis())
-            addRequestStatement.setString(2, user)
-            addRequestStatement.setInt(3, matchingTracks[0].id)
-            addRequestStatement.execute()
-        }
-        return matchingTracks
+    override fun addRequest(user: String, trackId: Int) {
+        addRequestStatement.setLong(1, System.currentTimeMillis())
+        addRequestStatement.setString(2, user)
+        addRequestStatement.setInt(3, trackId)
+        addRequestStatement.execute()
     }
 
-    override fun addVeto(user: String, request: String): List<Track> {
-        val matchingTracks = getMatchingTracks(request)
-        if (matchingTracks.size == 1) {
-            addVetoStatement.setLong(1, System.currentTimeMillis())
-            addVetoStatement.setString(2, user)
-            addVetoStatement.setInt(3, matchingTracks[0].id)
-            addVetoStatement.execute()
+    override fun addVeto(user: String, trackId: Int) {
+        addVetoStatement.setLong(1, System.currentTimeMillis())
+        addVetoStatement.setString(2, user)
+        addVetoStatement.setInt(3, trackId)
+        addVetoStatement.execute()
+    }
+
+    override fun getMatchingTracks(partialTitle: String): List<Track> {
+        val fuzzyRequest = "%$partialTitle%".replace(Regex("[\\W_]+"), "%")
+        matchingQueryStatement.setString(1, fuzzyRequest)
+        val results = matchingQueryStatement.executeQuery()
+
+        val tracks = ArrayList<Track>()
+        while (results.next()) {
+            val file = File(results.getString("path"))
+            if (!file.exists())
+                continue
+
+            val track = createTrackFromResultSet(results, file)
+            tracks.add(track)
+            System.out.print(track.debugString)
         }
-        return matchingTracks
+        return tracks
     }
 
     override fun getLastRequestId(): Int? {
@@ -159,24 +169,6 @@ class SQLiteDatabase(config: Config) : Database {
             .parallel()
             .map(::TrackData)
             .collect(Collectors.toList<TrackData>())
-    }
-
-    private fun getMatchingTracks(request: String): List<Track> {
-        val fuzzyRequest = "%$request%".replace(Regex("[\\W_]+"), "%")
-        matchingQueryStatement.setString(1, fuzzyRequest)
-        val results = matchingQueryStatement.executeQuery()
-
-        val tracks = ArrayList<Track>()
-        while (results.next()) {
-            val file = File(results.getString("path"))
-            if (!file.exists())
-                continue
-
-            val track = createTrackFromResultSet(results, file)
-            tracks.add(track)
-            System.out.print(track.debugString)
-        }
-        return tracks
     }
 
     private fun createTrackFromResultSet(results: ResultSet, file: File, timestamp: Long = System.currentTimeMillis()): Track {

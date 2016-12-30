@@ -1,15 +1,16 @@
+import java.nio.charset.StandardCharsets
+
 import org.pircbotx.Configuration
 import org.pircbotx.PircBotX
 import org.pircbotx.cap.EnableCapHandler
-import java.nio.charset.StandardCharsets
 
 class DaCapoBot(config: Config,
                 player: Player,
-                database: Database,
-                commandRegistry: CommandRegistry) {
+                database: Database) {
     private val bot: PircBotX
 
     init {
+        val commands = CommandRegistry(config, database, player, this)
         val botConfig = Configuration.Builder()
             .setAutoNickChange(false)
             .setOnJoinWhoEnabled(false)
@@ -20,12 +21,16 @@ class DaCapoBot(config: Config,
             .setName(config.botName)
             .setServerPassword(config.oauth)
             .addAutoJoinChannel(config.ircChannel)
-            .addListener(BotListener(config, player, database, commandRegistry))
+            .addListener(BotListener(config, player, database, commands))
             .buildConfiguration()
         bot = PircBotX(botConfig)
     }
 
     fun start() {
         bot.startBot()
+    }
+
+    fun shutdown() {
+        bot.send().quitServer()
     }
 }

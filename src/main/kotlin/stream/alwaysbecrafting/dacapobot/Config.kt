@@ -12,8 +12,8 @@ class Config(propertiesPath: String) {
     val ircServer: String
     val ircChannel: String
     val oauth: String
-    val isDebugModeEnabled: Boolean
     val commandPrefix: String
+    val admins: Set<String>
 
     private val defaultProperties = mapOf(
         "music_directory" to Paths.get(System.getProperty("user.home"), "Music").toString(),
@@ -23,8 +23,8 @@ class Config(propertiesPath: String) {
         "irc_server"      to "irc.twitch.tv",
         "irc_channel"     to "#test",
         "oauth"           to "YOUR_OAUTH_TOKEN_HERE",
-        "debug"           to "false",
-        "command_prefix"  to "!"
+        "command_prefix"  to "!",
+        "admins"          to "comma delimited admin list here"
     )
 
     init {
@@ -41,8 +41,8 @@ class Config(propertiesPath: String) {
         ircServer          = props.getProperty("irc_server")
         ircChannel         = props.getProperty("irc_channel")
         oauth              = props.getProperty("oauth")
-        isDebugModeEnabled = props.getProperty("debug").toBoolean()
         commandPrefix      = props.getProperty("command_prefix")
+        admins             = props.getProperty("admins").split(",").map(String::trim).map(String::toLowerCase).toSet()
     }
 
 

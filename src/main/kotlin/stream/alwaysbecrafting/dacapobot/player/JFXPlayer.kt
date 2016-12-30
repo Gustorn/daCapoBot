@@ -1,7 +1,6 @@
 import javafx.embed.swing.JFXPanel
 import javafx.scene.media.Media
 import javafx.scene.media.MediaPlayer
-import java.io.PrintWriter
 
 class JFXPlayer(private val config: Config, private val database : Database) : Player {
     override var currentTrack: Track? = null
@@ -27,6 +26,11 @@ class JFXPlayer(private val config: Config, private val database : Database) : P
 
         player?.play()
         player?.setOnEndOfMedia { nextTrack() }
+    }
+
+    override fun stop() {
+        player?.stop()
+        config.liveTrackFile.printWriter().use { it.println("") }
     }
 
     override fun nextTrack() {

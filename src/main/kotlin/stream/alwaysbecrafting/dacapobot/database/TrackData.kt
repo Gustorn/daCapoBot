@@ -1,6 +1,7 @@
+import java.io.File
+
 import com.mpatric.mp3agic.ID3v1
 import com.mpatric.mp3agic.Mp3File
-import java.io.File
 
 class TrackData(private val file: File) {
     val title: String

@@ -24,17 +24,6 @@ inline fun Connection.processQuery(sql: String, action: (ResultSet) -> Unit) {
     }
 }
 
-inline fun <T> Connection.processSingle(sql: String, action: (ResultSet) -> T): T {
-    var statement: PreparedStatement? = null
-    try {
-        statement = this.prepareStatement(sql)
-        val results = statement.executeQuery()
-        return action(results)
-    } finally {
-        statement?.close()
-    }
-}
-
 inline fun Connection.executeUpdate(sql: String, action: (PreparedStatement) -> Unit) {
     var statement: PreparedStatement? = null
     try {

@@ -4,4 +4,5 @@ interface Player {
     fun nextTrack()
     fun setQueue()
     fun play()
+    fun stop()
 }
