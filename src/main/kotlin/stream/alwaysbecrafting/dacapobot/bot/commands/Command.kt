@@ -25,16 +25,17 @@ abstract class Command {
 }
 
 fun extractCommand(request: String, config: Config, strictMatching: Boolean = true): Pair<String, String?>? {
-    val trimmedRequest = request.trim()
-    return if (strictMatching && !trimmedRequest.startsWith(config.commandPrefix)) {
-        null
-    } else {
-        val strippedRequest = trimmedRequest.substring(config.commandPrefix.length)
-        val command = strippedRequest.split(Regex("\\s+"), 2)
-        val commandName = command[0]
-        val commandArgs = command.elementAtOrNull(1)
-        return Pair(commandName, commandArgs)
+    var preprocessedRequest = request.trim()
+    if (preprocessedRequest.startsWith(config.commandPrefix)) {
+        preprocessedRequest = preprocessedRequest.substring(config.commandPrefix.length)
+    } else if (strictMatching) {
+        return null
     }
+
+    val command = preprocessedRequest.split(Regex("\\s+"), 2)
+    val commandName = command[0]
+    val commandArgs = command.elementAtOrNull(1)
+    return Pair(commandName, commandArgs)
 }
 
 fun splitFlagsAndArguments(args: String): Pair<List<String>, String?> {
