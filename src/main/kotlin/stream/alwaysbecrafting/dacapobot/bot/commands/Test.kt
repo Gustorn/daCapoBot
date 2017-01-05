@@ -3,7 +3,7 @@ class Test : Command() {
     override val help = "Nothing to see here"
     override val permission = CommandPermission.ADMIN
 
-    override fun executeInternal(user: String, args: String?): String? {
+    override fun executeInternal(user: String, args: CommandArgs): String? {
         return "Slippy's not such a screw up after all"
     }
 }

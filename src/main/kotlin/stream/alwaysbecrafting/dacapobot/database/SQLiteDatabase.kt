@@ -93,7 +93,7 @@ class SQLiteDatabase(config: Config) : Database {
         addVetoStatement.execute()
     }
 
-    override fun getMatchingTracks(partialTitle: String): List<Track> {
+    override fun findByTitle(partialTitle: String): List<Track> {
         val fuzzyRequest = "%$partialTitle%".replace(Regex("[\\W_]+"), "%")
         matchingQueryStatement.setString(1, fuzzyRequest)
         val results = matchingQueryStatement.executeQuery()

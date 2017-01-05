@@ -7,8 +7,9 @@ interface Database {
     fun addRequest(user: String, trackId: Int)
     fun addVeto(user: String, trackId: Int)
 
+    fun findByTitle(partialTitle: String): List<Track>
+
     fun getRandomTrack(): Track?
     fun getLastRequestId(): Int?
     fun getNextRequested(timestamp: Long): Track?
-    fun getMatchingTracks(partialTitle: String): List<Track>
 }

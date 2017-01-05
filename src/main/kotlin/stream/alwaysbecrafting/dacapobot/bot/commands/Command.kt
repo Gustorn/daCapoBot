@@ -18,10 +18,26 @@ abstract class Command {
     fun execute(user: String, args: String?, config: Config): String? = if (!permission.canExecute(user, config)) {
         "I'm sorry $user, I'm afraid I can't do that."
     } else {
-        executeInternal(user, args)
+        executeInternal(user, CommandArgs(args))
     }
 
-    protected abstract fun executeInternal(user: String, args: String?): String?
+    protected abstract fun executeInternal(user: String, args: CommandArgs): String?
+}
+
+class CommandArgs(rawArgs: String?) {
+    val flags: List<String>
+    val parameter: String?
+
+    init {
+        if (rawArgs == null) {
+            flags = ArrayList()
+            parameter = null
+        } else {
+            val (parsedRequestFlags, parsedRequestParam) = splitFlagsAndParameter(rawArgs)
+            flags = parsedRequestFlags
+            parameter = parsedRequestParam
+        }
+    }
 }
 
 fun extractCommand(request: String, config: Config, strictMatching: Boolean = true): Pair<String, String?>? {
@@ -38,7 +54,7 @@ fun extractCommand(request: String, config: Config, strictMatching: Boolean = tr
     return Pair(commandName, commandArgs)
 }
 
-fun splitFlagsAndArguments(args: String): Pair<List<String>, String?> {
+fun splitFlagsAndParameter(args: String): Pair<List<String>, String?> {
     val flags = ArrayList<String>()
 
     var rest: String? = args.trimStart()

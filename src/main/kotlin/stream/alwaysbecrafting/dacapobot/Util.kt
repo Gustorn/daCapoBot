@@ -1,7 +1,7 @@
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import java.util.Properties
+import java.util.*
 
 fun createProperties(keyValuePairs: Iterable<Map.Entry<String, String>>): Properties {
     val props = Properties()
@@ -32,4 +32,14 @@ inline fun Connection.executeUpdate(sql: String, action: (PreparedStatement) -> 
     } finally {
         statement?.close()
     }
+}
+
+fun <T> joinTruncateAfter(strings: List<T>, maxElements: Int, separator: String, mapper: (T) -> String): String {
+    var result = strings.slice(0 until Math.min(maxElements, strings.size))
+            .map(mapper)
+            .joinToString(separator)
+    if (strings.size > maxElements) {
+       result += "$separator +${strings.size - maxElements} more"
+    }
+    return result
 }

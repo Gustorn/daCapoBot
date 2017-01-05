@@ -20,8 +20,8 @@ class BotListener(private val config: Config,
         val message = event.message ?: return
         database.logChat(user, message)
 
-        val (commandName, args) = extractCommand(message, config) ?: return
-        val response = commandRegistry[commandName]?.execute(user, args, config) ?: return
+        val (commandName, rawArgs) = extractCommand(message, config) ?: return
+        val response = commandRegistry[commandName]?.execute(user, rawArgs, config) ?: return
         event.respondWith(response)
     }
 }

@@ -2,9 +2,9 @@ class Veto(private val database: Database, private val player: Player) : Command
     override val name = "veto"
     override val help = "Usage: !veto {title}"
 
-    override fun executeInternal(user: String, args: String?): String? {
-        val title = args ?: return help
-        val tracks = database.getMatchingTracks(title)
+    override fun executeInternal(user: String, args: CommandArgs): String? {
+        val title = args.parameter ?: return help
+        val tracks = database.findByTitle(title)
 
         return when (tracks.size) {
             0 -> "Sorry, I couldn't find any tracks containing $title"
@@ -15,16 +15,7 @@ class Veto(private val database: Database, private val player: Player) : Command
                 } else {
                     null
                 }
-            else -> {
-                var response = tracks
-                    .slice(0 until Math.min(3, tracks.size))
-                    .map{ it.title }
-                    .joinToString(" | ")
-                if (tracks.size > 3) {
-                    response += " | +${tracks.size - 3} more"
-                }
-                response
-            }
+            else -> joinTruncateAfter(tracks, 3, " | ", { it.title })
         }
     }
 }
