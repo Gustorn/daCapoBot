@@ -35,10 +35,27 @@ inline fun Connection.executeUpdate(sql: String, action: (PreparedStatement) -> 
 }
 
 inline fun <T> Iterable<T>.joinToString(truncateAfter: Int, separator: String, mapper: (T) -> String): String {
-    val strings = this.take(truncateAfter).map(mapper).toList()
-    return if (strings.size > truncateAfter) {
-        return strings.joinToString(separator)
-    } else {
-        "${strings.joinToString(separator)} $separator +${strings.size - truncateAfter} more"
+    val iterator = this.iterator()
+    if (!iterator.hasNext()) {
+        return ""
     }
+
+    val builder  = StringBuilder()
+    builder.append(mapper(iterator.next()))
+
+    var elements = 1
+    while (iterator.hasNext() && elements < truncateAfter) {
+        builder.append(separator)
+        builder.append(mapper(iterator.next()))
+        elements += 1
+    }
+
+    if (elements > truncateAfter) {
+        builder.append(separator)
+        builder.append("+")
+        builder.append(elements - truncateAfter)
+        builder.append(" more")
+    }
+
+    return builder.toString()
 }
