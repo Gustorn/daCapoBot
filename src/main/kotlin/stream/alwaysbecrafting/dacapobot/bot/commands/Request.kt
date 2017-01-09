@@ -35,7 +35,7 @@ class Request(private val database: Database) : Command() {
                 database.addRequest(user, tracks[0].id)
                 return "${tracks[0].title} added to the queue."
             }
-            else -> joinTruncateAfter(tracks, 3, " | ", { it.title })
+            else -> tracks.joinToString(truncateAfter = 3, separator = " | ", mapper = { it.title })
         }
     }
 }

@@ -13,7 +13,7 @@ class JFXPlayer(private val config: Config, private val database : Database) : P
 
     override fun setQueue() {
         currentTrack = findExistingTrack { database.getRandomTrack() }
-        System.out.println( "queue " + this.currentTrack )
+        println( "queue ${this.currentTrack}")
     }
 
     override fun play() {
@@ -21,7 +21,7 @@ class JFXPlayer(private val config: Config, private val database : Database) : P
 
         player?.stop()
         player = MediaPlayer(Media(track.uri))
-        System.out.println("Now Playing: ${track.title}")
+        println("Now Playing: ${track.title}")
         config.liveTrackFile.printWriter().use { it.println(track.title) }
 
         player?.play()

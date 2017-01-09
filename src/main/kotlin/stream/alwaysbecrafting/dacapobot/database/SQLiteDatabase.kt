@@ -26,7 +26,7 @@ class SQLiteDatabase(config: Config) : Database {
         createOrUpgrade(config)
         connection = DriverManager.getConnection(getConnectionString(config))
         connection.autoCommit = true
-        System.out.println("Connection to SQLite has been established.")
+        println("Connection to SQLite has been established.")
 
         val loggingSql = "INSERT INTO chat_log(timestamp,user,message) VALUES(?,?,?)"
         loggingStatement = connection.prepareStatement(loggingSql)
@@ -54,7 +54,7 @@ class SQLiteDatabase(config: Config) : Database {
     }
 
     override fun addMusicFromDirectory(directory: File) {
-        System.out.println("Checking for tracks to insert...")
+        println("Checking for tracks to insert...")
         val newTracks = getNewTracksFromDirectory(directory)
 
         connection.autoCommit = false
@@ -106,7 +106,7 @@ class SQLiteDatabase(config: Config) : Database {
 
             val track = createTrackFromResultSet(results, file)
             tracks.add(track)
-            System.out.print(track.debugString)
+            print(track.debugString)
         }
         return tracks
     }

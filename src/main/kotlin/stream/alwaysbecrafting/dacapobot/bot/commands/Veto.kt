@@ -15,7 +15,7 @@ class Veto(private val database: Database, private val player: Player) : Command
                 } else {
                     null
                 }
-            else -> joinTruncateAfter(tracks, 3, " | ", { it.title })
+            else -> tracks.joinToString(truncateAfter = 3, separator = " | ", mapper = { it.title })
         }
     }
 }

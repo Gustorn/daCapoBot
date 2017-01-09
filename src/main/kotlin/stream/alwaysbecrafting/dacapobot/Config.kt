@@ -57,8 +57,8 @@ class Config(propertiesPath: String) {
         FileInputStream(file).use { props.load(it) }
 
         if (!props.stringPropertyNames().containsAll(defaultProperties.keys)) {
-            System.err.println("Error: Missing Property in " + file.canonicalPath + "\n\t\tDelete to generate defaults.")
-            System.exit(0)
+            System.err.println("Error: Missing Property in ${file.canonicalPath}.\nDelete to generate defaults.")
+            System.exit(1)
         }
         return props
     }

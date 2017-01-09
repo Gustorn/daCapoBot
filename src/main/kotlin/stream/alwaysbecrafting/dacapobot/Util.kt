@@ -34,12 +34,11 @@ inline fun Connection.executeUpdate(sql: String, action: (PreparedStatement) -> 
     }
 }
 
-fun <T> joinTruncateAfter(strings: List<T>, maxElements: Int, separator: String, mapper: (T) -> String): String {
-    var result = strings.slice(0 until Math.min(maxElements, strings.size))
-            .map(mapper)
-            .joinToString(separator)
-    if (strings.size > maxElements) {
-       result += "$separator +${strings.size - maxElements} more"
+inline fun <T> Iterable<T>.joinToString(truncateAfter: Int, separator: String, mapper: (T) -> String): String {
+    val strings = this.take(truncateAfter).map(mapper).toList()
+    return if (strings.size > truncateAfter) {
+        return strings.joinToString(separator)
+    } else {
+        "${strings.joinToString(separator)} $separator +${strings.size - truncateAfter} more"
     }
-    return result
 }
